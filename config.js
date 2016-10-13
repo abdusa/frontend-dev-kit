@@ -2,6 +2,7 @@ var pjson = require('./package.json')
 
 module.exports = function() {
   var config = {
+    projEnv: process.env.NODE_ENV !== 'production' ? 'development' : 'production',
     name: pjson.name,   // Naming your project based on package.json
     source: './src/',
     site: './site/',
