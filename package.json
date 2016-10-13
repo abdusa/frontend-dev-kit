@@ -1,0 +1,41 @@
+{
+  "name": "frontend-dev-kit",
+  "version": "1.0.0",
+  "description": "Simple frontend development kit for your project",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "abdusa <abdusa.alam@gmail.com>",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "frontend",
+    "task-runner",
+    "devkit",
+    "gulp",
+    "boilerplate",
+    "development",
+    "web"
+  ],
+  "devDependencies": {
+    "browser-sync": "^2.17.3",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-changed": "^1.3.2",
+    "gulp-clean": "^0.3.2",
+    "gulp-concat": "^2.6.0",
+    "gulp-delete-file": "^1.0.2",
+    "gulp-jshint": "^2.0.1",
+    "gulp-plumber": "^1.1.0",
+    "gulp-pug": "^3.1.0",
+    "gulp-sass": "^2.3.2",
+    "gulp-uglify": "^2.0.0",
+    "gulp-zip": "^3.2.0",
+    "jshint": "^2.9.3",
+    "jshint-stylish": "^2.2.1"
+  }
+}
