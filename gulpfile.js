@@ -18,6 +18,7 @@ var concat        = require('gulp-concat');
 
 // NodeJS core package
 var colors        = require('colors');
+var fs            = require('fs');
 
 // Declaring paths variable
 var source        = config.source;
@@ -67,10 +68,26 @@ gulp.task('toPug', () => {
 // Copying static html file if you dont using pug.
 gulp.task('copyHTML', () => {
   console.log('---------] => Copying static html to site folder'.yellow);
-  return gulp.src(markup.in_html)
-    .pipe(plumber())
-    .pipe(changed(site))
-    .pipe(gulp.dest(site));
+  fs.readdir('./src/markup/', function(err, data){
+    if(data.indexOf('html') === 1){
+      return gulp.src(markup.in_html)
+        .pipe(plumber())
+        .pipe(changed(site))
+        .pipe(gulp.dest(site));
+    } else {
+      console.log('---------] => index.html not found! Create index.html file first!'.red)
+    }
+  });
+});
+
+gulp.task('hell', () => {
+  fs.readdir('./src/markup/', (err, data) => {
+    if(data.indexOf('html')){
+      console.log(data);
+    } else {
+      console.log('engga ada html');
+    }
+  });
 });
 
 // Copying img file
@@ -131,7 +148,7 @@ gulp.task('jsCompose',() => {
 
 // Copy third party js libs
 gulp.task('copyVendors', () => {
-  console.log('---------] => Copying vendors (third party library here)'.yellow);
+  console.log('---------] => Copying vendors (third party JS library here)'.yellow);
   return gulp.src(js.in + 'vendors/*.js')
     .pipe(changed(js.out + 'vendors'))
     .pipe(gulp.dest(js.out + 'vendors'));
@@ -174,8 +191,8 @@ gulp.task('syncSite', () => {
 
 // Build
 gulp.task('build', ['copyHTML', 'toCSS','jsCompose', 'copyVendors'], () => {
-  console.log('---------] => Your in' + config.projEnv + 'mode'.yellow);
-  console.log('---------] => Your project name: ' + config.name + '. Building ...'.yellow);
+  console.log('---------] => Your in '.yellow + config.projEnv.yellow + ' mode'.yellow);
+  console.log('---------] => Your project name: '.yellow + config.name.yellow + '. Building ...'.yellow);
 
 });
 gulp.task('build-with-pug', ['toPug', 'toCSS','jsCompose', 'copyVendors'], () => {
@@ -187,57 +204,68 @@ gulp.task('build-with-pug', ['toPug', 'toCSS','jsCompose', 'copyVendors'], () =>
 gulp.task('serve', ['build', 'syncSite'], () => {
   console.log('---------] => Serving project and watch for change'.yellow);
   // Watch index.html
-  gulp.watch(['./src/markup/index.html'], ['copyHTML', browserSync.reload]);
+  gulp.watch(markup.in_html, ['copyHTML', browserSync.reload]);
 
   // Watch js folder and vendors folder
-  gulp.watch(['./src/assets/js/*.js', './src/assets/js/lib/*.js'], ['jsCompose', browserSync.reload]);
-  gulp.watch('./src/assets/js/vendors/*.js', ['copyVendors', browserSync.reload]);
+  gulp.watch([js.in + '*.js', js.in + 'lib/*.js'], ['jsCompose', browserSync.reload]);
+  gulp.watch(js.in + 'vendors/*.js', ['copyVendors', browserSync.reload]);
 
   // watch sass folder
-  gulp.watch('./src/assets/styles/style.{sass,scss}', ['toCSS'] );
+  gulp.watch(styles.in, ['toCSS'] );
 
   // Watch image folder
-  gulp.watch('./src/assets/img/', ['copyImg']);
+  gulp.watch(images.in, ['copyImg']);
 });
 
 // serve-with-pug task
 gulp.task('serve-with-pug', ['build-with-pug', 'syncSite'], () => {
-  console.log('---------] => Serving project and watch for change with pug template enable'.yellow);
+  console.log('---------] => Serving project and watch for change using pug template for html'.yellow);
   // Watch index.html
-  gulp.watch(['./src/markup/index.pug'], ['toPug', browserSync.reload]);
+  gulp.watch(markup.in_pug, ['toPug', browserSync.reload]);
 
   // Watch js folder and vendors folder
-  gulp.watch(['./src/assets/js/*.js', './src/assets/js/lib/*.js'], ['jsCompose', browserSync.reload]);
-  gulp.watch('./src/assets/js/vendors/*.js', ['copyVendors', browserSync.reload]);
+  gulp.watch([js.in + '*.js', js.in + 'lib/*.js'], ['jsCompose', browserSync.reload]);
+  gulp.watch(js.in + 'vendors/*.js', ['copyVendors', browserSync.reload]);
 
   // watch sass folder
-  gulp.watch('./src/assets/styles/style.{sass,scss}', ['toCSS'] );
+  gulp.watch(styles.in, ['toCSS'] );
 
   // Watch image folder
-  gulp.watch('./src/assets/img/', ['copyImg']);
+  gulp.watch(images.in, ['copyImg']);
 });
 
 // help task
 gulp.task('help', () => {
-  console.log('|-------------------------------------------------------------------|');
-  console.log('|================= FRONTEND DEVELOPMENT KIT HELP ===================|');
-  console.log('|-------------------------------------------------------------------|');
+  console.log('|-------------------------------------------------------------------|'.magenta);
+  console.log('|================= FRONTEND DEVELOPMENT KIT HELP ===================|'.magenta);
+  console.log('|-------------------------------------------------------------------|'.magenta);
   console.log('|                                                                   |');
-  console.log('| Usage             : gulp [command]                                   |');
+  console.log('| Usage             : gulp [command]                                |');
   console.log('| The commands for the task runner are the following.               |');
   console.log('|-------------------------------------------------------------------|');
   console.log('| help              : Print this message                            |');
   console.log('| clean             : Clean all compiled files on ./site folder     |');
   console.log('| zipit [option]    : Compress project                              |');
   console.log('|       --all       : Compress all files and folder                 |');
-  console.log('|       --site-only : Compress compiled files in the site folder    |');
+  console.log('|       --site-only : Compress compiled files in the ./site folder  |');
   console.log('|                                                                   |');
   console.log('| serve             : Compile, watch, and start browser-sync        |');
   console.log('| serve-with-pug    : Like serve but using pug template for html    |');
   console.log('| build             : Compile project only                          |');
   console.log('| build-with-pug    : Like build but using pug template for html    |');
   console.log('|                                                                   |');
-  console.log('|-------------------------------------------------------------------|');
+  console.log('| Example usage     :                                               |');
+  console.log('|  gulp zipit --all : Compressing all project files and folders     |');
+  console.log('|                                                                   |');
+  console.log('| If you want run gulp in production mode                           |');
+  console.log('|  for windows      : set NODE_ENV=production&&gulp [command]       |');
+  console.log('|  for *nix         : NODE_ENV=production&&gulp [command]           |');
+  console.log('|                                                                   |');
+  console.log('| Example usage with environment run in windows                     |');
+  console.log('|                     set NODE_ENV=production&&gulp build           |');
+  console.log('|                     Run gulp build in production mode             |');
+  console.log('|                                                                   |');
+  console.log('|-------------------------------------------------------------------|'.magenta);
 });
 
 gulp.task('default', ['help']);
