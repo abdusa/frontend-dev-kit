@@ -68,16 +68,10 @@ gulp.task('toPug', () => {
 // Copying static html file if you dont using pug.
 gulp.task('copyHTML', () => {
   console.log('---------] => Copying static html to site folder'.yellow);
-  fs.readdir('./src/markup/', function(err, data){
-    if(data.indexOf('html') === 1){
-      return gulp.src(markup.in_html)
-        .pipe(plumber())
-        .pipe(changed(site))
-        .pipe(gulp.dest(site));
-    } else {
-      console.log('---------] => index.html not found! Create index.html file first!'.red)
-    }
-  });
+  return gulp.src(markup.in_html)
+    .pipe(plumber())
+    .pipe(changed(site))
+    .pipe(gulp.dest(site));
 });
 
 gulp.task('hell', () => {
@@ -143,7 +137,6 @@ gulp.task('jsCompose',() => {
       .pipe(uglify())
       .pipe(gulp.dest(js.out));
   }
-
 });
 
 // Copy third party js libs
@@ -195,6 +188,7 @@ gulp.task('build', ['copyHTML', 'toCSS','jsCompose', 'copyVendors'], () => {
   console.log('---------] => Your project name: '.yellow + config.name.yellow + '. Building ...'.yellow);
 
 });
+// Build with pug / jade
 gulp.task('build-with-pug', ['toPug', 'toCSS','jsCompose', 'copyVendors'], () => {
   console.log('---------] => Your in '.yellow + config.projEnv.yellow + ' mode'.yellow);
   console.log('---------] => Your project name: '.yellow + config.name.yellow + '. Building project with pug template enable...'.yellow);
