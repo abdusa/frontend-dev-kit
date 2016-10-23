@@ -74,16 +74,6 @@ gulp.task('copyHTML', () => {
     .pipe(gulp.dest(site));
 });
 
-gulp.task('hell', () => {
-  fs.readdir('./src/markup/', (err, data) => {
-    if(data.indexOf('html')){
-      console.log(data);
-    } else {
-      console.log('engga ada html');
-    }
-  });
-});
-
 // Copying img file
 gulp.task('copyImg', ['cleanImgSite'], () => {
   console.log('---------] => Copying image'.yellow);
@@ -94,7 +84,7 @@ gulp.task('copyImg', ['cleanImgSite'], () => {
 });
 
 gulp.task('cleanImgSite', () => {
-  return gulp.src(images.in + '*')
+  return gulp.src(images.out + '*')
     .pipe(clean());
 });
 
@@ -112,7 +102,7 @@ gulp.task('toCSS', () => {
       cascade: true
     }))
     .pipe(gulp.dest(styles.out))
-    .pipe(browserSync.reload({ stream: true}));
+    .pipe(browserSync.stream());
 });
 
 // Javascript process like minifying and concat
@@ -137,6 +127,7 @@ gulp.task('jsCompose',() => {
       .pipe(uglify())
       .pipe(gulp.dest(js.out));
   }
+
 });
 
 // Copy third party js libs
@@ -145,6 +136,13 @@ gulp.task('copyVendors', () => {
   return gulp.src(js.in + 'vendors/*.js')
     .pipe(changed(js.out + 'vendors'))
     .pipe(gulp.dest(js.out + 'vendors'));
+});
+
+gulp.task('copyCSSLib', () => {
+  console.log('---------] => Copying vendors (third party CSS library here)'.yellow);
+  return gulp.src(source + config.assetsPath.sass + 'vendors/*.css')
+    .pipe(changed(site + config.assetsPath.css))
+    .pipe(gulp.dest(site + config.assetsPath.css));
 });
 
 // Zipping file for production or archive it
@@ -178,18 +176,18 @@ gulp.task('syncSite', () => {
       baseDir: site,
       index: 'index.html'
     },
-    open: 'local'
+    open: 'local',
+    notify: false
   })
 });
 
 // Build
-gulp.task('build', ['copyHTML', 'toCSS','jsCompose', 'copyVendors'], () => {
+gulp.task('build', ['copyHTML', 'toCSS','jsCompose', 'copyVendors', 'copyCSSLib', 'copyImg'], () => {
   console.log('---------] => Your in '.yellow + config.projEnv.yellow + ' mode'.yellow);
   console.log('---------] => Your project name: '.yellow + config.name.yellow + '. Building ...'.yellow);
 
 });
-// Build with pug / jade
-gulp.task('build-with-pug', ['toPug', 'toCSS','jsCompose', 'copyVendors'], () => {
+gulp.task('build-with-pug', ['toPug', 'toCSS','jsCompose', 'copyVendors', 'copyCSSLib', 'copyImg'], () => {
   console.log('---------] => Your in '.yellow + config.projEnv.yellow + ' mode'.yellow);
   console.log('---------] => Your project name: '.yellow + config.name.yellow + '. Building project with pug template enable...'.yellow);
 });
@@ -209,6 +207,8 @@ gulp.task('serve', ['build', 'syncSite'], () => {
 
   // Watch image folder
   gulp.watch(images.in, ['copyImg']);
+
+  gulp.watch(source + config.assetsPath.sass + 'vendors/*.css', ['copyCSSLib']);
 });
 
 // serve-with-pug task
@@ -226,6 +226,8 @@ gulp.task('serve-with-pug', ['build-with-pug', 'syncSite'], () => {
 
   // Watch image folder
   gulp.watch(images.in, ['copyImg']);
+
+  gulp.watch(source + config.assetsPath.sass + 'vendors/*.css', ['copyCSSLib']);
 });
 
 // help task
