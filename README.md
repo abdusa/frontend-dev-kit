@@ -57,6 +57,6 @@ gulp [command]
 |**--all**|Compress all files and folder|
 |**--site-only**|Compress files site folder only|
 |**serve**         |Compile, watch, and start browser-sync for auto reload|
-|**serve-with-pug**|Like compile but using pug/jade for templating (make sure remove index.html and create index.pug before using it)|
+|**serve:with-pug**|Like compile but using pug/jade for templating (make sure remove index.html and create index.pug before using it)|
 |**build**         |Compile project only|
-|**build-with-pug**|Like build but using pug / jade for templating|
+|**build:with-pug**|Like build but using pug / jade for templating|
